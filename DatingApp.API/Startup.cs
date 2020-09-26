@@ -1,6 +1,7 @@
 using System.Data.Common;
 using System.Net;
 using System.Text;
+using AutoMapper;
 using DatingApp.API.Data;
 using DatingApp.API.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -29,9 +30,18 @@ namespace DatingApp.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(opt => 
+            {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
+
             services.AddCors();
+            services.AddAutoMapper(typeof(DatingRepository).Assembly);
+
+            services.AddTransient<Seed>();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IDatingRepository, DatingRepository>();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => 
                 {
@@ -40,8 +50,8 @@ namespace DatingApp.API
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
                             .GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
-                            ValidateIssuer = false,
-                            ValidateAudience = false
+                        ValidateIssuer = false,
+                        ValidateAudience = false
                     };
                 });
         }
@@ -53,32 +63,32 @@ namespace DatingApp.API
             
             if (env.IsDevelopment())
             {
-                //app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();
 
-                app.UseExceptionHandler(builder => 
-                {
-                    builder.Run(async context => {
+                // app.UseExceptionHandler(builder => 
+                // {
+                //     builder.Run(async context => {
                         
-                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                //         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         
-                        var exception = context.Features.Get<IExceptionHandlerFeature>();
+                //         var exception = context.Features.Get<IExceptionHandlerFeature>();
 
-                        if (exception != null) 
-                        {
-                            if (exception.Error is DbException)
-                            {
-                                string message = "Our database server is offline. Please, try again later.";
-                                context.Response.AddApplicationError(message);
-                                await context.Response.WriteAsync(message);
-                            }
-                            else
-                            {
-                                context.Response.AddApplicationError(exception.Error.Message);
-                                await context.Response.WriteAsync(exception.Error.Message);
-                            }
-                        }
-                    });
-                });
+                //         if (exception != null) 
+                //         {
+                //             if (exception.Error is DbException)
+                //             {
+                //                 string message = "Our database server is offline. Please, try again later.";
+                //                 context.Response.AddApplicationError(message);
+                //                 await context.Response.WriteAsync(message);
+                //             }
+                //             else
+                //             {
+                //                 context.Response.AddApplicationError(exception.Error.Message);
+                //                 await context.Response.WriteAsync(exception.Error.Message);
+                //             }
+                //         }
+                //     });
+                // });
             }
 
             // app.UseHttpsRedirection();
@@ -87,9 +97,8 @@ namespace DatingApp.API
 
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
-            app.UseAuthorization();
-
             app.UseAuthentication();
+            app.UseAuthorization();          
 
             app.UseEndpoints(endpoints =>
             {
