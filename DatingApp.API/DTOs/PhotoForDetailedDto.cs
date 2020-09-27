@@ -4,7 +4,7 @@ namespace DatingApp.API.DTOs
 {
     public class PhotoForDetailedDto
     {
-         public int Id { get; set; }
+        public int Id { get; set; }
 
         public string Url { get; set; }
 
