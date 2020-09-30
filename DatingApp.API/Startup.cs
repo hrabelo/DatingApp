@@ -63,32 +63,32 @@ namespace DatingApp.API
             
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                // app.UseDeveloperExceptionPage();
 
-                // app.UseExceptionHandler(builder => 
-                // {
-                //     builder.Run(async context => {
+                app.UseExceptionHandler(builder => 
+                {
+                    builder.Run(async context => {
                         
-                //         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         
-                //         var exception = context.Features.Get<IExceptionHandlerFeature>();
+                        var exception = context.Features.Get<IExceptionHandlerFeature>();
 
-                //         if (exception != null) 
-                //         {
-                //             if (exception.Error is DbException)
-                //             {
-                //                 string message = "Our database server is offline. Please, try again later.";
-                //                 context.Response.AddApplicationError(message);
-                //                 await context.Response.WriteAsync(message);
-                //             }
-                //             else
-                //             {
-                //                 context.Response.AddApplicationError(exception.Error.Message);
-                //                 await context.Response.WriteAsync(exception.Error.Message);
-                //             }
-                //         }
-                //     });
-                // });
+                        if (exception != null) 
+                        {
+                            string message;
+                            if (exception.Error is DbException)
+                            {
+                                message = "Our database server is offline. Please, try again later.";
+                            }
+                            else
+                            {
+                                message = exception.Error.Message;
+                            }
+                            context.Response.AddApplicationError(message);
+                            await context.Response.WriteAsync(message);
+                        }
+                    });
+                });
             }
 
             // app.UseHttpsRedirection();
