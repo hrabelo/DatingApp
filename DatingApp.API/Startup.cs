@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace DatingApp.API
 {
@@ -54,6 +55,16 @@ namespace DatingApp.API
                         ValidateAudience = false
                     };
                 });
+            
+            services.AddSwaggerGen(options => 
+            {
+                options.SwaggerDoc(Configuration.GetSection("Application").GetValue<string>("Version"), 
+                new OpenApiInfo() {
+                    Title = Configuration.GetSection("Application").GetValue<string>("Name"),
+                    Version = Configuration.GetSection("Application").GetValue<string>("Version")
+                 });
+            });
+
         }
 
 
@@ -99,6 +110,13 @@ namespace DatingApp.API
 
             app.UseAuthentication();
             app.UseAuthorization();          
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", 
+                Configuration.GetSection("Application").GetValue<string>("Name") + " " + Configuration.GetSection("Application").GetValue<string>("Version"));
+            });
 
             app.UseEndpoints(endpoints =>
             {
