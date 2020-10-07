@@ -1,7 +1,7 @@
-import { BrowserModule, HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
+import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from '@kolkov/ngx-gallery';
@@ -10,6 +10,7 @@ import { FileUploadModule } from 'ng2-file-upload';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 
 import { AppComponent } from './app.component';
@@ -33,6 +34,7 @@ import { AuthGuard } from './_guards/auth.guard';
 import { UserService } from './_services/user.service';
 import { PreventUnsavedChanges } from './_guards/prevent-unsaved-change.guard';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
+import { CountryService } from './_services/country.service';
 
 
 
@@ -57,11 +59,12 @@ export function tokenGetter() {
    ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    BrowserAnimationsModule,
     BsDropdownModule.forRoot(),
+    BsDatepickerModule.forRoot(),
     TabsModule.forRoot(),
     RouterModule.forRoot(appRoutes),
     NgxGalleryModule,
@@ -76,13 +79,14 @@ export function tokenGetter() {
   ],
   providers: [
     AuthService,
-    ErrorInterceptorProvider,
     AlertifyService,
-    AuthGuard,
+    CountryService,
     UserService,
+    AuthGuard,
     MemberDetailResolver,
     MemberListResolver,
     MemberEditResolver,
+    ErrorInterceptorProvider,
     PreventUnsavedChanges
   ],
   bootstrap: [AppComponent]
