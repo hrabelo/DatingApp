@@ -59,6 +59,8 @@ namespace DatingApp.API
                     };
                 });
             
+            services.AddScoped<LogUserActivity>();
+            
             services.AddSwaggerGen(options => 
             {
                 options.SwaggerDoc(Configuration.GetSection("Application").GetValue<string>("Version"), 
